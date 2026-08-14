@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Picky</title>
+
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.3.1/css/all.min.css"
+      integrity="sha512-QeR2VH+lsBE5LSAe1Q5EnTBbe7XTBubt8dG93Y7gidSgdMCr8nVqKcfKAMyN96SV8KDbZVTDXChatu5G2KQGzg=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+  </head>
+  <body class="bg-emerald-500">
+    <header class="bg-emerald-900 p-4 flex justify-between items-center">
+      <h1 class="text-4xl font-bold text-white">Picky</h1>
+      <a
+        href="https://github.com/duebenpresleylewis"
+        class="fa-brands fa-github block text-3xl text-amber-50 pr-6"
+        target="_blank"
+      ></a>
+    </header>
+
+    <main id="main-container" class="flex flex-col justify-center items-center p-4">
+      <div class="search-container bg-green-200 p-5 flex justify-between items-center">
+        <form action="">
+          <input type="text" placeholder="Enter a color" class="bg-amber-300 rounded-xl py-0.5 px-1">
+          <!-- if selected from color picker insert the value into above input statement -->
+
+          <input type="color" title="color picker" class="inline-block rounded-full cursor-pointer">
+        </form>
+      </div>
+    </main>
+
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
+
