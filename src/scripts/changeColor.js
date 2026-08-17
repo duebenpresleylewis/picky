@@ -1,7 +1,6 @@
 import colorList from "../data/colors.json";
 const userInput = document.getElementById("user-input");
 const previewBtn = document.getElementById("preview-btn");
-const mainContainer = document.getElementById("main-container");
 const colorInput = document.getElementById("color-input");
 
 export function initialiseChangeColor() {
@@ -31,7 +30,11 @@ export function initialiseChangeColor() {
         }
       }
 
-      mainContainer.style.backgroundColor = colorToDisplay;
+      document.body.style.backgroundColor = colorToDisplay;
+
+      
+      // const mainContainer = document.getElementById("main-container");
+      // mainContainer.style.backgroundColor = colorToDisplay;
       // console.log(colorToDisplay)
     }
   });
