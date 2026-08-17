@@ -1,7 +1,9 @@
 import colorList from "../data/colors.json";
+import {showModal} from '../scripts/modal.js';
+
 const userInput = document.getElementById("user-input");
 const previewBtn = document.getElementById("preview-btn");
-const mainContainer = document.getElementById("main-container");
+const colorInput = document.getElementById("color-input");
 
 export function initialiseChangeColor() {
   // event listeners
@@ -9,28 +11,45 @@ export function initialiseChangeColor() {
     const userColor = userInput.value.trim();
 
     if (userColor.length === 0) {
-      // todo: change to modal later
-      alert("provide a color before submitting");
+      showModal("white", "#7d7d7d", "Oops! You need to choose a color before previewing.")
       return;
     } else {
       let colorToDisplay = "";
+      if (userColor[0] === "#") {
+        colorToDisplay = userColor;
+      } else {
+        colorList.forEach((color) => {
+          if (color.name.toLowerCase() === userColor.toLowerCase()) {
+            colorToDisplay = color.hex;
+          }
+        });
 
-      colorList.forEach((color) => {
-        if (color.name.toLowerCase() === userColor.toLowerCase()) {
-          colorToDisplay = color.hex;
+        if (colorToDisplay === "") {
+          showModal("white", "#7d7d7d", "Selected color not found in our palette. Pick another to preview.")
+          return;
         }
-      });
+      }
 
-      if (colorToDisplay === "") {
-        // todo: change to modal later
-        alert("color not available");
-        return;
-      }
-      else {
-        mainContainer.style.backgroundColor = colorToDisplay;
-        // console.log(colorToDisplay)
-      }
+      document.body.style.backgroundColor = colorToDisplay;
+
+
+      // const mainContainer = document.getElementById("main-container");
+      // mainContainer.style.backgroundColor = colorToDisplay;
+      // console.log(colorToDisplay)
     }
+  });
+
+  colorInput.addEventListener("change", () => {
+    const userColorChoice = colorInput.value.trim();
+
+    if (!userColorChoice) {
+      alert("Select a valid color");
+      return;
+    }
+
+    userInput.value = userColorChoice;
+
+    console.log(userColorChoice);
   });
 }
 // todo
