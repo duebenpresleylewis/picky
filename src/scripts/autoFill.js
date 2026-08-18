@@ -26,6 +26,7 @@ export function initialiseAutoFill() {
       }
       let suggestion = document.createElement("div");
       suggestion.textContent = color.name;
+      suggestion.className = "suggestion";
       suggestionsContainer.appendChild(suggestion);
     });
 
@@ -36,9 +37,16 @@ export function initialiseAutoFill() {
   });
 
 //   suggestion click
+  // use event delegation (bubbling) to handle clicks on dynamically created suggestions
   suggestionsContainer.addEventListener('click', (event) => {
-    if(event.target === suggestion) {
-        
-    }
+    const clicked = event.target.closest('.suggestion');
+    if (!clicked || !suggestionsContainer.contains(clicked)) return;
+
+    // set the input value to the clicked suggestion text and clear suggestions
+    searchInput.value = clicked.textContent;
+
+    // clearing suggestions after user selects one
+    suggestionsContainer.replaceChildren();
+    searchInput.focus();
   });
 }
