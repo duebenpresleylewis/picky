@@ -5,15 +5,17 @@ let suggestionsContainer = document.getElementById("suggestions");
 const maxSuggestions = 5;
 
 export function initialiseAutoFill() {
+  // guard: ensure DOM elements exist
+  if (!searchInput || !suggestionsContainer) return;
   // everytime the content in the search ""input changes"" we monitor it
   searchInput.addEventListener("input", () => {
     // everytime user changes the input, we must refresh it (kinda) to avoid appending other colors
     suggestionsContainer.replaceChildren();
-    const userInput = searchInput.value.trim()?.toLowerCase();
+    suggestionsContainer.classList.remove("active");
 
-    if (userInput === "") {
-      return;
-    }
+    const userInput = searchInput.value.trim().toLowerCase();
+
+    if (userInput === "") return;
 
     const filteredColorList = colorList.filter((color) => {
       // it is returning object, not color.name
@@ -30,20 +32,26 @@ export function initialiseAutoFill() {
       suggestionsContainer.appendChild(suggestion);
     });
 
-    suggestionsContainer.className = "active";
+    if (suggestionsContainer.children.length > 0) {
+      suggestionsContainer.classList.add("active");
+    }
   });
 
-//   suggestion click
+  //   suggestion click
   // use event delegation (bubbling) to handle clicks on dynamically created suggestions
-  suggestionsContainer.addEventListener('click', (event) => {
-    const clicked = event.target.closest('.suggestion');
+  suggestionsContainer.addEventListener("click", (event) => {
+    const clicked = event.target.closest(".suggestion");
     if (!clicked || !suggestionsContainer.contains(clicked)) return;
 
     // set the input value to the clicked suggestion text and clear suggestions
     searchInput.value = clicked.textContent;
 
     // clearing suggestions after user selects one
+    suggestionsContainer.classList.remove("active");
     suggestionsContainer.replaceChildren();
     searchInput.focus();
+
+    // let other listeners know the input changed (e.g., for validation or UI updates)
+    searchInput.dispatchEvent(new Event("input", { bubbles: true }));
   });
 }
