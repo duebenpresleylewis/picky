@@ -30,10 +30,7 @@ export function initialiseAutoFill() {
       suggestionsContainer.appendChild(suggestion);
     });
 
-    console.log(suggestionsContainer);
-
-    console.log(userInput);
-    console.log(filteredColorList);
+    suggestionsContainer.className = "active";
   });
 
 //   suggestion click

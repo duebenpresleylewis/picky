@@ -1,5 +1,6 @@
 import './style.css'
 import './styles/modal.css';
+import './styles/suggestions.css';
 import { initialiseModal } from './scripts/modal.js';
 import { initialiseChangeColor } from './scripts/changeColor.js'
 import { initialiseAutoFill } from './scripts/autoFill.js';
