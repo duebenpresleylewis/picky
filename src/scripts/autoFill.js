@@ -27,9 +27,21 @@ export function initialiseAutoFill() {
         return;
       }
       let suggestion = document.createElement("div");
-      suggestion.textContent = color.name;
-      suggestion.className = "suggestion";
-      suggestionsContainer.appendChild(suggestion);
+
+      const indexToHighlight = color.name.toLowerCase().indexOf(userInput);
+
+      if(indexToHighlight !== -1) {
+        const startPortion = color.name.slice(0, indexToHighlight);
+        const portionToHighlight = color.name.slice(indexToHighlight, userInput.length);
+        const endPortion = color.name.slice(indexToHighlight + userInput.length, color.name.length);
+
+        // const suggestionToDisplay = startPortion + "<strong>" + portionToHighlight + "</strong>" + endPortion;
+        // suggestion.textContent = color.name;
+        suggestion.innerHTML = startPortion + "<strong>" + portionToHighlight + "</strong>" + endPortion;
+        suggestion.className = "suggestion";
+        suggestionsContainer.appendChild(suggestion);
+
+      }
     });
 
     if (suggestionsContainer.children.length > 0) {
