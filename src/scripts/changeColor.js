@@ -1,46 +1,45 @@
 import colorList from "../data/colors.json";
-import {showModal} from '../scripts/modal.js';
+import { showModal } from "../scripts/modal.js";
 
 const userInput = document.getElementById("user-input");
 const previewBtn = document.getElementById("preview-btn");
 const colorInput = document.getElementById("color-input");
 
 export function initialiseChangeColor() {
-  // event listeners
+  if (!previewBtn || !userInput || !colorInput) return;
+
   previewBtn.addEventListener("click", () => {
     const userColor = userInput.value.trim();
 
     if (userColor.length === 0) {
-      showModal("white", "#7d7d7d", "Oops! You need to choose a color before previewing.")
+      showModal("white", "#7d7d7d", "Oops! You need to choose a color before previewing.");
       return;
-    } else {
-      let colorToDisplay = "";
-      if (userColor[0] === "#") {
-        colorToDisplay = userColor;
-      } else {
-        colorList.forEach((color) => {
-          if (color.name.toLowerCase() === userColor.toLowerCase()) {
-            colorToDisplay = color.hex;
-          }
-        });
-
-        if (colorToDisplay === "") {
-          showModal("white", "#7d7d7d", "Selected color not found in our palette. Pick another to preview.")
-          return;
-        }
-      }
-
-      document.body.style.backgroundColor = colorToDisplay;
-
-
-      // const mainContainer = document.getElementById("main-container");
-      // mainContainer.style.backgroundColor = colorToDisplay;
-      // console.log(colorToDisplay)
     }
+
+    let colorToDisplay = "";
+    const hexRegex = /^#([0-9A-F]{3}|[0-9A-F]{6})$/i;
+
+    if (userColor[0] === "#") {
+      if (!hexRegex.test(userColor)) {
+        showModal("white", "#7d7d7d", "Invalid hex color format.");
+        return;
+      }
+      colorToDisplay = userColor;
+    } else {
+      const matched = colorList.find((c) => c.name.toLowerCase() === userColor.toLowerCase());
+      if (matched) {
+        colorToDisplay = matched.hex;
+      } else {
+        showModal("white", "#7d7d7d", "Selected color not found in our palette. Pick another to preview.");
+        return;
+      }
+    }
+
+    document.body.style.backgroundColor = colorToDisplay;
   });
 
   colorInput.addEventListener("change", () => {
-    const userColorChoice = colorInput.value.trim();
+    const userColorChoice = colorInput.value?.trim();
 
     if (!userColorChoice) {
       alert("Select a valid color");
@@ -48,8 +47,6 @@ export function initialiseChangeColor() {
     }
 
     userInput.value = userColorChoice;
-
-    console.log(userColorChoice);
   });
 }
 // todo

@@ -1,57 +1,124 @@
 import colorList from "../data/colors.json";
 
-const searchInput = document.getElementById("user-input");
-let suggestionsContainer = document.getElementById("suggestions");
 const maxSuggestions = 5;
 
+function debounce(fn, wait = 150) {
+  let t;
+  return (...args) => {
+    clearTimeout(t);
+    t = setTimeout(() => fn.apply(this, args), wait);
+  };
+}
+
 export function initialiseAutoFill() {
-  // guard: ensure DOM elements exist
+  const searchInput = document.getElementById("user-input");
+  const suggestionsContainer = document.getElementById("suggestions");
+
   if (!searchInput || !suggestionsContainer) return;
-  // everytime the content in the search ""input changes"" we monitor it
-  searchInput.addEventListener("input", () => {
-    // everytime user changes the input, we must refresh it (kinda) to avoid appending other colors
+
+  // helper: select a suggestion (shared for clicks and keyboard)
+  const selectSuggestion = (el) => {
+    if (!el) return;
+    searchInput.value = el.textContent;
+    suggestionsContainer.classList.remove("active");
+    suggestionsContainer.replaceChildren();
+    searchInput.focus();
+    searchInput.dispatchEvent(new Event("input", { bubbles: true }));
+  };
+
+  const focusSuggestionAt = (list, idx) => {
+    if (!list || !list.length) return;
+    idx = (idx + list.length) % list.length;
+    list.forEach((s) => s.classList.remove("focused"));
+    const el = list[idx];
+    el.classList.add("focused");
+    el.focus();
+  };
+
+  const renderSuggestions = (userInput) => {
     suggestionsContainer.replaceChildren();
     suggestionsContainer.classList.remove("active");
+    suggestionsContainer.setAttribute("aria-expanded", "false");
 
-    const userInput = searchInput.value.trim().toLowerCase();
+    if (!userInput) return;
 
-    if (userInput === "") return;
+    const filteredColorList = colorList.filter((color) =>
+      color.name.toLowerCase().includes(userInput)
+    );
 
-    const filteredColorList = colorList.filter((color) => {
-      // it is returning object, not color.name
-      return color.name.toLowerCase().includes(userInput);
-    });
+    filteredColorList.slice(0, maxSuggestions).forEach((color) => {
+      const indexToHighlight = color.name.toLowerCase().indexOf(userInput);
+      if (indexToHighlight === -1) return;
 
-    filteredColorList.forEach((color, index) => {
-      if (index >= maxSuggestions) {
-        return;
-      }
-      let suggestion = document.createElement("div");
-      suggestion.textContent = color.name;
+      const startPortion = color.name.slice(0, indexToHighlight);
+      const portionToHighlight = color.name.slice(
+        indexToHighlight,
+        indexToHighlight + userInput.length
+      );
+      const endPortion = color.name.slice(indexToHighlight + userInput.length);
+
+      const suggestion = document.createElement("div");
+      suggestion.innerHTML = startPortion + "<strong>" + portionToHighlight + "</strong>" + endPortion;
       suggestion.className = "suggestion";
+      suggestion.setAttribute("role", "option");
+      suggestion.tabIndex = 0;
+      suggestion.addEventListener("click", () => selectSuggestion(suggestion));
+      suggestion.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") selectSuggestion(suggestion);
+      });
+
       suggestionsContainer.appendChild(suggestion);
     });
 
     if (suggestionsContainer.children.length > 0) {
       suggestionsContainer.classList.add("active");
+      suggestionsContainer.setAttribute("aria-expanded", "true");
+    }
+  };
+
+  searchInput.addEventListener(
+    "input",
+    debounce(() => {
+      const userInput = searchInput.value.trim().toLowerCase();
+      renderSuggestions(userInput);
+    }, 120)
+  );
+
+  // keyboard navigation for suggestions
+  searchInput.addEventListener("keydown", (e) => {
+    const list = suggestionsContainer.querySelectorAll(".suggestion");
+    if (!list.length) return;
+
+    const focused = suggestionsContainer.querySelector(".focused");
+    let idx = Array.prototype.indexOf.call(list, focused);
+
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      idx = idx + 1;
+      focusSuggestionAt(list, idx);
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault();
+      idx = idx - 1;
+      focusSuggestionAt(list, idx);
+    } else if (e.key === "Enter") {
+      if (document.activeElement && document.activeElement.classList.contains("suggestion")) {
+        e.preventDefault();
+        selectSuggestion(document.activeElement);
+      }
+    } else if (e.key === "Escape") {
+      suggestionsContainer.replaceChildren();
+      suggestionsContainer.classList.remove("active");
+      suggestionsContainer.setAttribute("aria-expanded", "false");
+      searchInput.focus();
     }
   });
 
-  //   suggestion click
-  // use event delegation (bubbling) to handle clicks on dynamically created suggestions
-  suggestionsContainer.addEventListener("click", (event) => {
-    const clicked = event.target.closest(".suggestion");
-    if (!clicked || !suggestionsContainer.contains(clicked)) return;
-
-    // set the input value to the clicked suggestion text and clear suggestions
-    searchInput.value = clicked.textContent;
-
-    // clearing suggestions after user selects one
-    suggestionsContainer.classList.remove("active");
-    suggestionsContainer.replaceChildren();
-    searchInput.focus();
-
-    // let other listeners know the input changed (e.g., for validation or UI updates)
-    searchInput.dispatchEvent(new Event("input", { bubbles: true }));
+  // click outside suggestions to close
+  document.addEventListener("click", (ev) => {
+    if (!suggestionsContainer.contains(ev.target) && ev.target !== searchInput) {
+      suggestionsContainer.replaceChildren();
+      suggestionsContainer.classList.remove("active");
+      suggestionsContainer.setAttribute("aria-expanded", "false");
+    }
   });
 }
