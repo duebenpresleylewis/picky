@@ -1,5 +1,6 @@
 import colorList from "../data/colors.json";
 import { showModal } from "../scripts/modal.js";
+import { loader } from "./utility/loading.js";
 
 const userInput = document.getElementById("user-input");
 const previewBtn = document.getElementById("preview-btn");
@@ -35,7 +36,16 @@ export function initialiseChangeColor() {
       }
     }
 
-    document.body.style.backgroundColor = colorToDisplay;
+    const loadElement = document.querySelector('.loading-overlay');
+
+    if (!loadElement) {
+      document.body.style.backgroundColor = colorToDisplay;
+      return;
+    }
+
+    loader(loadElement, 1000, false).then(() => {
+      document.body.style.backgroundColor = colorToDisplay;
+    });
   });
 
   colorInput.addEventListener("change", () => {
