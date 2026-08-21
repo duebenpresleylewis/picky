@@ -19,7 +19,7 @@ export function initialiseAutoFill() {
   // helper: select a suggestion (shared for clicks and keyboard)
   const selectSuggestion = (el) => {
     if (!el) return;
-    searchInput.value = el.textContent;
+    searchInput.value = el.dataset.color;
     suggestionsContainer.classList.remove("active");
     suggestionsContainer.replaceChildren();
     searchInput.focus();
