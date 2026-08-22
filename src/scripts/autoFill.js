@@ -19,7 +19,7 @@ export function initialiseAutoFill() {
   // helper: select a suggestion (shared for clicks and keyboard)
   const selectSuggestion = (el) => {
     if (!el) return;
-    searchInput.value = el.dataset.color;
+    searchInput.value = el.textContent;
     suggestionsContainer.classList.remove("active");
     suggestionsContainer.replaceChildren();
     searchInput.focus();
@@ -64,7 +64,10 @@ export function initialiseAutoFill() {
       suggestion.tabIndex = 0;
       suggestion.addEventListener("click", () => selectSuggestion(suggestion));
       suggestion.addEventListener("keydown", (e) => {
-        if (e.key === "Enter") selectSuggestion(suggestion);
+        if (e.key === "Enter") {
+          e.preventDefault();
+          selectSuggestion(suggestion);
+        }
       });
 
       suggestionsContainer.appendChild(suggestion);
@@ -101,9 +104,15 @@ export function initialiseAutoFill() {
       idx = idx - 1;
       focusSuggestionAt(list, idx);
     } else if (e.key === "Enter") {
+      // If a suggestion is focused, select it. If suggestions are visible but
+      // none focused, select the first suggestion. Prevent form submission.
+      const firstSuggestion = suggestionsContainer.querySelector('.suggestion');
       if (document.activeElement && document.activeElement.classList.contains("suggestion")) {
         e.preventDefault();
         selectSuggestion(document.activeElement);
+      } else if (suggestionsContainer.classList.contains('active') && firstSuggestion) {
+        e.preventDefault();
+        selectSuggestion(firstSuggestion);
       }
     } else if (e.key === "Escape") {
       suggestionsContainer.replaceChildren();
@@ -121,4 +130,8 @@ export function initialiseAutoFill() {
       suggestionsContainer.setAttribute("aria-expanded", "false");
     }
   });
+
+  // Prevent the parent form from submitting when Enter is used to pick suggestions
+  const parentForm = searchInput.closest('form');
+  if (parentForm) parentForm.addEventListener('submit', (e) => e.preventDefault());
 }

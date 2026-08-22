@@ -3,8 +3,8 @@ import './styles/modal.css';
 import './styles/suggestions.css';
 import './styles/loader.css';
 import { initialiseModal } from './scripts/modal.js';
-import { initialiseChangeColor } from './scripts/changeColor.js'
 import { initialiseAutoFill } from './scripts/autoFill.js';
+import { initialiseChangeColor } from './scripts/changeColor.js'
 
 // initialises modal features for user
 initialiseModal();
